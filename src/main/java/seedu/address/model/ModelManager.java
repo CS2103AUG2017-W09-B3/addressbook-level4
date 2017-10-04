@@ -85,26 +85,30 @@ public class ModelManager extends ComponentManager implements Model {
     }
 
     @Override
-    public void addTagToAPerson(ReadOnlyPerson target, Tag tag)throws PersonNotFoundException, DuplicatePersonException{
+    public void addTagToAPerson(ReadOnlyPerson target, Tag tag)throws PersonNotFoundException, DuplicatePersonException {
         Person newPerson = new Person(target);
-        Set<Tag> tagSet = target.getTags();tagSet.add(tag);
+        Set<Tag> tagSet = target.getTags();
+        tagSet.add(tag);
         newPerson.setTags(tagSet);
         addressBook.updatePerson(target, newPerson);
     }
 
     @Override
-    public void deleteTag(Tag tag)throws PersonNotFoundException, DuplicatePersonException{
-        for(ReadOnlyPerson person : addressBook.getPersonList()){
+    public void deleteTag(Tag tag)throws PersonNotFoundException, DuplicatePersonException {
+        for (ReadOnlyPerson person : addressBook.getPersonList()) {
             Person newPerson = new Person(person);
-            newPerson.setTags(removeTagInSet(person.getTags(),tag));
+            newPerson.setTags(removeTagInSet(person.getTags(), tag));
             addressBook.updatePerson(person, newPerson);
         }
     }
 
-    public Set<Tag> removeTagInSet(Set<Tag> tagSetToBeModified, Tag tag){
+    /**
+     * Removes a given tag from a Tag Set and returns the modified Tag Set
+     */
+    public Set<Tag> removeTagInSet(Set<Tag> tagSetToBeModified, Tag tag) {
         boolean contains = false;
         for (Tag tagInSet : tagSetToBeModified) {
-            if(tagInSet.equals(tag)){
+            if (tagInSet.equals(tag)) {
                 tagSetToBeModified.remove(tagInSet);
             }
         }
