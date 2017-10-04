@@ -3,6 +3,7 @@ package seedu.address.model;
 import static java.util.Objects.requireNonNull;
 import static seedu.address.commons.util.CollectionUtil.requireAllNonNull;
 
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.logging.Logger;
 
@@ -12,9 +13,11 @@ import javafx.collections.transformation.FilteredList;
 import seedu.address.commons.core.ComponentManager;
 import seedu.address.commons.core.LogsCenter;
 import seedu.address.commons.events.model.AddressBookChangedEvent;
+import seedu.address.model.person.Person;
 import seedu.address.model.person.ReadOnlyPerson;
 import seedu.address.model.person.exceptions.DuplicatePersonException;
 import seedu.address.model.person.exceptions.PersonNotFoundException;
+import seedu.address.model.tag.Tag;
 
 /**
  * Represents the in-memory model of the address book data.
@@ -81,6 +84,37 @@ public class ModelManager extends ComponentManager implements Model {
         indicateAddressBookChanged();
     }
 
+    @Override
+    public void addTagToAPerson(ReadOnlyPerson target, Tag tag)
+            throws PersonNotFoundException, DuplicatePersonException {
+        Person newPerson = new Person(target);
+        Set<Tag> tagSet = target.getTags();
+        tagSet.add(tag);
+        newPerson.setTags(tagSet);
+        addressBook.updatePerson(target, newPerson);
+    }
+
+    @Override
+    public void deleteTag(Tag tag)throws PersonNotFoundException, DuplicatePersonException {
+        for (ReadOnlyPerson person : addressBook.getPersonList()) {
+            Person newPerson = new Person(person);
+            newPerson.setTags(removeTagInSet(person.getTags(), tag));
+            addressBook.updatePerson(person, newPerson);
+        }
+    }
+
+    /**
+     * Removes a given tag from a Tag Set and returns the modified Tag Set
+     */
+    public Set<Tag> removeTagInSet(Set<Tag> tagSetToBeModified, Tag tag) {
+        boolean contains = false;
+        for (Tag tagInSet : tagSetToBeModified) {
+            if (tagInSet.equals(tag)) {
+                tagSetToBeModified.remove(tagInSet);
+            }
+        }
+        return tagSetToBeModified;
+    }
     //=========== Filtered Person List Accessors =============================================================
 
     /**
