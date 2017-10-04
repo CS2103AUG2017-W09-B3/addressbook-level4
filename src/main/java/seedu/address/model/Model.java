@@ -37,7 +37,7 @@ public interface Model {
     void updatePerson(ReadOnlyPerson target, ReadOnlyPerson editedPerson)
             throws DuplicatePersonException, PersonNotFoundException;
 
-    void deleteTag(Tag tag)throws PersonNotFoundException,DuplicatePersonException;
+    void deleteTag(Tag tag)throws PersonNotFoundException, DuplicatePersonException;
 
     void addTagToAPerson(ReadOnlyPerson target, Tag tag)throws PersonNotFoundException, DuplicatePersonException;
 
