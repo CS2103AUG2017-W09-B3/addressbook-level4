@@ -729,12 +729,88 @@ Priorities: High (must have) - `* * \*`, Medium (nice to have) - `* \*`, Low (un
 
 |`* * *` |user |find a person by name |locate details of persons without having to go through the entire list
 
+|`* * *` |user |sort contacts by different attributes, ascending/descending order |look for specific contact easily
+
+|`* * *` |user |classify my contacts by a tag |find the relevant people under a tag quickly
+
+|`* * *` |user |find contact by substring of name |find a person even if I forget the exact contact name
+
+|`* * *` |user |find specific contacts by attributes other than name |find out the contact’s name
+
+|`* * *` |user |add in contact information |update my contact list
+
+|`* * *` |user |remove contact |keep the contact list concise
+
 |`* *` |user |hide link:#private-contact-detail[private contact details] by default |minimize chance of someone else seeing them by accident
 
-|`*` |user with many persons in the address book |sort persons by name |locate a person easily
-|=======================================================================
+|`* *` |lazy user |launch commands by keying in shortcuts |save time
 
-{More to be added}
+|`* *` |power user |launch a shell version of the product |operate without the clutter
+
+|`* *` |user |record schedules with my contacts (like a calendar) | keep track of my upcoming events
+
+|`* *` |user |see my contact’s address on google map |know which area do they resides in visually and know how far is it from my current location
+
+|`* *` |worried user |export my contact list to a backup file (separate from data/addressbook.xml) |restore my contact list in case corruption happens
+
+|`* *` |user |change the color theme/background image of the product |have a nice visual experience
+
+|`* *` |power user |exclude words in my searches |filter my search result
+
+|`* *` |user |copy contact details to clipboard | have quick access to contact details in plaintext
+
+|`* *` |user |have a separate prompt for add users |choose to not remember the full command
+
+|`* *` |user |store social media information for contacts |keep track
+
+|`* *` |organise user |have different classification for tag to multiple contacts |have a finer classification by event
+
+|`* *` |user |sort contacts by chronological order (most recently added) |keep track of my records
+
+|`* *` |user |find out the route from one contact’s address to my home address |know the way to my contact’s home
+
+|`* *` |user |synchronize contact information with all devices |choose not to update one by one
+
+|`* *` |user |have a separate prompt for edit users |choose not to remember the full command
+
+|`* *` |user |trace back the commands I entered before |enter commands more conveniently
+
+|`* *` |forgetful user |input events based on natural language |add in events easily
+
+|`* *` |user |type in intuitive commands(add, insert, put) |choose not to remember specific commands
+
+|`* *` |user |delete multiple user by index |perform batch deletion
+
+|`* *` |user |delete users by name |choose not to search for the contact’s index before deletion
+
+|`* *` |user |edit user by inputting name |choose not to search for the contact’s index before editing
+
+|`* *` |careless user |specify number of times to undo/redo with in input parameter |save time
+
+|`* *` |user |get a list of contact that I removed (like a Recycle bin) |recover the accidentally deleted ones
+
+|`* *` |user |remove a contact permanently from the deleted contact list (like empty Recycle bin) |keep the contact list clean
+
+|`*` |user with many persons in the address book |sort persons by name |locate a person easily
+
+|`*` |user |send an email from the product (launch the system’s default mailto:) |do something with the contacts
+
+|`*` |user |customize the URL of my contact (instead of the default google page) |be up to date with how my contacts are doing
+
+|`*` |user |get notification on contacts’ birthdays |send birthday wishes
+
+|`*` |user |get notification on upcoming events |choose not to remember mentally
+
+|`*` |user |store standalone events (does not involve anyone in the contact list) |keep track of my schedule
+
+|`*` |user |tag the hobbies of contacts |know what to do with friends in parties
+
+|`*` |user |get contact details by scanning QR code |choose not to type manually
+
+|`*` |user |find date matches |meet new friends
+
+|`*` |user |share events online for people to see |people can join me
+|=======================================================================
 
 [appendix]
 == Use Cases
@@ -742,41 +818,213 @@ Priorities: High (must have) - `* * \*`, Medium (nice to have) - `* \*`, Low (un
 (For all use cases below, the *System* is the `AddressBook` and the *Actor* is the `user`, unless specified otherwise)
 
 [discrete]
-=== Use case: Delete person
+=== Use case: Add contact by name
 
 *MSS*
 
-1.  User requests to list persons
-2.  AddressBook shows a list of persons
-3.  User requests to delete a specific person in the list
-4.  AddressBook deletes the person
+1.  User input command to add contact: add [NAME]
+2.  Address book launches a window prompting user to fill in required fields (phone number, address...)
+3.  User fill in required fields and confirms inputted values
+4.  Address book stores contact entered and shows “Added” message
 +
 Use case ends.
 
 *Extensions*
 
 [none]
-* 2a. The list is empty.
+* 3a. User enters incomplete contact information with missing fields
++
+[none]
+** 3a1. Address book shows warning and prompt user to fill in missing fields.
++
+Use case resumes at step 3.
+
+* *a. User exits from the “add” window
 +
 Use case ends.
 
-* 3a. The given index is invalid.
+[discrete]
+=== Use case: Edit contact by name
+
+*MSS*
+
+1.  User input command to edit contact: edit [NAME]
+2.  Address book returns list of users with given name
+3.  User input appends index to command
+4.  Address book launches a window prompting user to edit contacts
+5.  User edit contact details and confirms inputted values
+6.  Address book updates contact details
++
+Use case ends.
+
+*Extensions*
+
+[none]
+* 2a. No contacts with given name
 +
 [none]
-** 3a1. AddressBook shows an error message.
+** 2a1. Address book notify no user found
 +
-Use case resumes at step 2.
+Use case ends.
 
-{More to be added}
+* 2b. Only one contact match with given name
++
+[none]
+** 2b1. Address book deletes user and outputs result
++
+Use case ends.
+
+* *a. User exits from the “edit” window
++
+Use case ends.
+
+[discrete]
+=== Use case: Delete contact by name
+
+*MSS*
+
+1.  User input command to delete contact: delete [NAME]
+2.  Address book returns list of users with given name
+3.  User input appends index to command
+4.  Address book deletes user and outputs result
++
+Use case ends.
+
+*Extensions*
+
+[none]
+* 2a. No contacts with given name
++
+[none]
+** 2a1. Address book notify no user found
++
+Use case ends.
+
+* 2b. Only one contact match with given name
++
+[none]
+** 2b1. Address book deletes user and outputs result
++
+Use case ends.
+
+[discrete]
+=== Use case: Find contact by name/keyword
+
+*MSS*
+
+1.  User input command to find contacts: find [NAME/KEYWORD]
+2.  Address book shows a list of contacts with given name
++
+Use case ends.
+
+*Extensions*
+
+[none]
+* 2a. No name matches but keyword matches exist
++
+[none]
+** 2a1. Address book notify users and display contacts with given keyword instead
++
+Use case ends.
+
+* 2b. No name matches and keyword matches exist
++
+[none]
+** 2b1. Address book shows person not found message
++
+Use case ends.
+
+[discrete]
+=== Use case: Sort contact list
+
+*MSS*
+
+1.  User request to sort the persons in address book
+2.  Address book shows the sortable attributes and request user to select one
+3.  User selects an attribute to sort by and if ascending or descending
+4.  Address book shows the sorted list to user
++
+Use case ends.
+
+*Extensions*
+
+[none]
+* 2a. The address book is empty
++
+[none]
+** 2a1. Address book shows an empty list message
++
+Use case ends.
+
+* 3a. User enters an invalid attribute
++
+[none]
+** 3a1. Address book shows an error message
++
+Use case ends.
+
+[discrete]
+=== Use case: Route to contact’s address
+
+*MSS*
+
+1.  User inputs command to locate contact: map [name]
+2.  Address book returns list of users with given name
+3.  User input appends index to command
+4.  System launches Google Maps with destination set to contact’s home address
+5.  User input source address in Google Maps and select enter
+6.  Google Maps displays route from source to destination
++
+Use case ends.
+
+*Extensions*
+
+[none]
+* 5a. User is only interested in know where is contact’s address
++
+Use case ends.
+
+* 5*a. User decides to move on to other commands
++
+[none]
+** 5*a1. Address book removes Google Map from view
++
+Use case ends.
+
+[discrete]
+=== Use case: Search Recycle list
+
+*MSS*
+
+1.  User input command to list previously deleted contacts: bin
+2.  Address book display a list of previously deleted contacts
++
+Use case ends.
+
+*Extensions*
+
+[none]
+* 2a. No contacts have been deleted before
++
+[none]
+** 2a1. Address book shows an empty list message
++
+Use case ends.
 
 [appendix]
 == Non Functional Requirements
 
+.  Address book should have restricted access.
+.  System should responds within 2 seconds.
+.  Address book source should be open sources.
+.  Should work on both 32bit and 64bit.
+.  Users need consent before they can access other people's contact list.
+.  Instructions should be clear and straightforward.
+.  Users are able to type short commands (less than 50 characters) and achieve what they want.
+.  The address book product should offer free online service.
 .  Should work on any link:#mainstream-os[mainstream OS] as long as it has Java `1.8.0_60` or higher installed.
 .  Should be able to hold up to 1000 persons without a noticeable sluggishness in performance for typical usage.
 .  A user with above average typing speed for regular English text (i.e. not code, not system admin commands) should be able to accomplish most of the tasks faster using commands than using the mouse.
-
-{More to be added}
 
 [appendix]
 == Glossary
@@ -827,7 +1075,7 @@ A command that closes the address book application
 list
 
 ....
-A command that lists all the persons in the address book
+A command that lists all contacts in the address book
 ....
 
 [[find]]
@@ -841,7 +1089,7 @@ A command that searches for a person by name
 undo
 
 ....
-A command that reverse changes made to the contacts list
+A command that reverses changes made to the contacts list
 ....
 
 [[redo]]
@@ -879,7 +1127,7 @@ index
 A running number used to label the contacts, often inserted after a command to serve as contact selection
 ....
 
-[[recycle list]]
+[[recycle-list]]
 recycle list
 
 ....
