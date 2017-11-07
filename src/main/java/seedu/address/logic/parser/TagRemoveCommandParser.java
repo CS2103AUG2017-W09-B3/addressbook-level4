@@ -58,7 +58,7 @@ public class TagRemoveCommandParser implements Parser<TagRemoveCommand> {
             newTag = newTag.concat(" " + argsArray[i]);
         }
         HashSet<String> tagSet = new HashSet<>();
-        tagSet.add(newTag);
+        tagSet.add(newTag.trim());
         TagRemoveDescriptor tagRemoveDescriptor = new TagRemoveDescriptor();
         try {
             parseTagsForEdit(tagSet).ifPresent(tagRemoveDescriptor::setTags);
