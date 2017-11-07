@@ -225,17 +225,17 @@ This section describes some noteworthy details on how certain features are imple
 // tag::findmech[]
 === Enhanced Find mechanism
 
-The enhanced version of find mechanism is facilitated by the `AddressBookParser`, which resides inside `LogicManager`. It allows the users to search for person(s) by substrings of multiple different attributes (e.g. `Name`, `Phone`, `Email`, `Address`), which the case is insensitive for `Name`, `Email` and `Address` attributes.
+The enhanced version of find mechanism is facilitated by the `AddressBookParser`, which resides inside `LogicManager`. It allows you to search for person(s) by substrings of multiple different attributes (e.g. `Name`, `Phone`, `Email`, `Address`), which the case is insensitive for `Name`, `Email` and `Address` attributes.
 
-Users can only do searching by `Name`, `Phone`, `Email` or `Address`. They are not allowed to search by `Tag`. Instead, they can search for person(s) by tags using `t-find` command.
+You are only allowed to search by `Name`, `Phone`, `Email` or `Address`. Searching by `Tag` or `Birthday` is not allowed. In order to search by tags, you can use the tag-find (`t-find`) command.
 
-The following diagram shows the inheritance diagram for commands:
+The following diagram shows the inheritance diagram for Find command:
 
 image::LogicCommandClassDiagram.png[width="800"]
 
-When the users are using the find command, they are required to provided at least one keyword for any available attribute. Keywords of the same attribute need to be grouped together with a prefix (e.g. `n/`, `p/`, `e/`, `a/`). In this case, each prefix is allowed to appear at most once.
+When you are using the find command, you need to provided at least one keyword for any available attribute. Keywords of the same attribute need to be grouped together with a prefix (e.g. `n/`, `p/`, `e/`, `a/`). In this case, each prefix is allowed to appear at most once.
 
-During the implementation, `FindCommandParser` class splits the keywords of different attributes by searching for the location of the prefixes, and store the keywords into separate ArrayLists. As a `NameContainsKeywordsPredicate` needs to be passed to `FindCommand` class, all the keywords from the ArrayLists are added to the predicate in order with each prefix added at front for separation.
+During the implementation, `FindCommandParser` class splits the keywords of different attributes by searching for the locations of the prefixes, and then stores the keywords into separate ArrayLists. As a `NameContainsKeywordsPredicate` needs to be passed to `FindCommand` class, all the keywords from the ArrayLists are added to the predicate in order with each prefix added in front for separation.
 
 For example, the parser for name keywords is implemented this way:
 [source,java]
@@ -266,7 +266,7 @@ if (trimmedNames != null) {
 NameContainsKeywordsPredicate predicate = new NameContainsKeywordsPredicate(keyWordsToSearch);
 ----
 
-When the `FindCommand` class is executing, the keywords are taken out from the predicate and stored into separate ArrayLists again by distinguishing the prefixes stored in front of each type of keywords. The reason we do this twice is because we want to keep the consistency of all the command classes instead of changing the parameter type passed into `FindCommand` class to a list of ArrayLists. Then the person(s) can be searched separately by different attributes. For each attribute, every keyword is taken out and compared to the corresponding details of all the persons in the list. Once the keyword is matched to any substring of the detail of a person, then the person's name will be stored into an ArrayList `namesToSearch`. After searching all the keywords, a name list with persons with details matching at least one keyword is obtained and passed to `updateFilteredPersonList` method. Finally, the person list is updated and shown on the user interface.
+When `FindCommand` class is executing, the keywords are taken out from the predicate and stored into separate ArrayLists again by distinguishing the prefixes stored in front of each type of keywords. The reason we do this twice is because we want to keep the consistency of all the command classes instead of changing the parameter type passed into `FindCommand` class. The contacts can be searched separately by different attributes. For each attribute, every keyword is taken out and compared to the corresponding details of all the persons in the list. Once the keyword is matched to any substring of the person details, then the person's name will be stored into a list. After searching all the keywords, a name list with persons with details matching at least one keyword is obtained and passed to `updateFilteredPersonList` method. Finally, the person list is updated and displayed in the person list panel.
 
 For example, searching for name keywords is implemented this way:
 [source,java]
@@ -295,33 +295,268 @@ The following sequence diagram shows how the find command works:
 image::FindCommandSequenceDiagram.png[width="800"]
 
 [NOTE]
-If no argument is provided by users after the command word, an invalid format `Exception` will be thrown.
+If no argument is provided after the command word, an invalid format message will be shown.
 
 
 [NOTE]
-If no prefix is found inside the argument, then an invalid format `Exception` will be thrown.
+If no prefix is found inside the argument, then an invalid format message will be shown.
 
 
 [NOTE]
-If some dummy values are found before the first prefix and after the command word, then an invalid format `Exception` will be thrown.
+If some dummy values are found before the first prefix and after the command word, then an invalid format message will be shown.
 
 
 [NOTE]
-If no keywords are provided by user after a prefix, then an invalid format `Exception` will be thrown.
+If no keywords are provided after a prefix, then an invalid format message will be shown.
 
 
 [NOTE]
-If more than one same prefix is provided by user, then the person list will be searched only by keywords behind the first prefix.
+If more than one same prefix is provided, then the person list will be searched only by keywords behind the first prefix.
 
 ==== Design Considerations
 
 **Aspect:** Find person by `Address` keyword +
 **Alternative 1 (current choice):** Find person by a single `Address` keyword +
 **Pros:** We will not need to separate multiple addresses since it is difficult to distinguish. +
-**Cons:** It is inconvenient for users to find persons from different locations. +
+**Cons:** It is inconvenient to find multiple persons from different locations. +
 **Alternative 2:** Separate different addresses by a special character (e.g. `;` or `*`) +
-**Pros:** Users are able to find person(s) staying at different locations. +
-**Cons:** The find command becomes very long. It is hard for users to type the addresses correctly.
+**Pros:** You are able to find person(s) staying at different locations. +
+**Cons:** The find command becomes very long. It is hard for you to type all the addresses correctly.
+// end::findmech[]
+
+// tag::mapmech[]
+=== Map mechanism
+
+Map function shows you the home address of a person in Google Map, which is displayed in the centre browser view panel. It allows you to see your friend's location by specifying the index number of the person inside the app. In addition, by entering your current location, it can also show you the shortest path from your location to the selected person's location.
+
+You are not allowed to find the locations of multiple persons by using this feature. Also, only one starting location is allowed when you are trying to find the route.
+
+The following diagram shows the inheritance diagram for the Map commands:
+
+image::MapCommandClassDiagram.png[width="800"]
+
+When you are using the map-show `(m-show)` command, you need to specify the index number of the person whom you would like to see the location of. As for the map-route `(m-route)` command, apart from specifying the index number, you also need to add a prefix `a/` before you enter your current location. The prefix should appear only once.
+
+During the implementation, map command parser class extracts the index number of the contact and passes the value to the corresponding map command. For `m-route` command, the parser class also extracts your current location by using the prefix symbol. The map command classes will post and raise an event once they are called, based on the parameters they have received.
+
+If you enter `m-show` command, a `BrowserPanelShowLocationEvent` will start. It will build a Google map URL with the specified location of the person selected, and load the Google map in the browser panel.
+
+The event for showing the location is implemented this way:
+[source,java]
+----
+public class BrowserPanelShowLocationEvent extends BaseEvent {
+
+    private final ReadOnlyPerson person;
+
+    public BrowserPanelShowLocationEvent(ReadOnlyPerson person) {
+        this.person = person;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
+
+    public ReadOnlyPerson getNewSelection() {
+        return person;
+    }
+}
+----
+
+The browser panel class that handles this event is implemented this way:
+[source,java]
+----
+public void loadLocationPage(ReadOnlyPerson person) {
+    loadPage(GOOGLE_MAP_SEARCH_URL_PREFIX + person.getAddress().toString().replaceAll(" ", "+")
+            + GOOGLE_MAP_SEARCH_URL_SUFFIX);
+}
+
+public void loadPage(String url) {
+    Platform.runLater(() -> browser.getEngine().load(url));
+}
+
+private void handleBrowserPanelShowLocationEvent(BrowserPanelShowLocationEvent event) {
+    logger.info(LogsCenter.getEventHandlingLogMessage(event));
+    loadLocationPage(event.getNewSelection());
+}
+----
+
+If you enter `m-route` command, a `BrowserPanelFindRouteEvent` will start. It will build a Google map URL with the specified location of the person selected and your location, and load the Google map in the browser panel.
+
+The event for displaying the route is implemented this way:
+[source,java]
+----
+public class BrowserPanelFindRouteEvent extends BaseEvent {
+
+    private final ReadOnlyPerson person;
+    private final String address;
+
+    public BrowserPanelFindRouteEvent(ReadOnlyPerson person, String address) {
+        this.person = person;
+        this.address = address;
+    }
+
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName();
+    }
+
+    public ReadOnlyPerson getSelectedPerson() {
+        return person;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+}
+----
+
+The browser panel class that handles this event is implemented this way:
+[source,java]
+----
+public void loadRoutePage(ReadOnlyPerson person, String address) {
+    String startLocation = address.trim().replaceAll(" ", "+");
+    String endLocation = person.getAddress().toString().trim().replaceAll(" ", "+");
+    loadPage(GOOGLE_MAP_DIRECTION_URL_PREFIX + startLocation
+            + GOOGLE_MAP_SEARCH_URL_SUFFIX + endLocation
+            + GOOGLE_MAP_SEARCH_URL_SUFFIX);
+}
+
+public void loadPage(String url) {
+    Platform.runLater(() -> browser.getEngine().load(url));
+}
+
+private  void handleBrowserPanelFindRouteEvent(BrowserPanelFindRouteEvent event) {
+    logger.info(LogsCenter.getEventHandlingLogMessage(event));
+    loadRoutePage(event.getSelectedPerson(), event.getAddress());
+}
+----
+
+The following sequence diagrams show you how the Map commands work:
+
+image::MapShowCommandSequenceDiagram.png[width="800"]
+
+image::MapRouteCommandSequenceDiagram.png[width="800"]
+
+[NOTE]
+If no argument is provided after the command word, an invalid format message will be shown.
+
+
+[NOTE]
+If the index number provided is out of the bound of person list, an invalid person index message will be shown.
+
+
+[NOTE]
+If no prefix is found inside the argument when typing `m-route` command, then an invalid format message will be shown.
+
+==== Design Considerations
+
+**Aspect:** Locate a person in Google map +
+**Alternative 1 (current choice):** Add the string value of address to Google map URL +
+**Pros:** The process of finding the location using Google map is simple and straightforward. +
+**Cons:** Google map is not able to find the location or route if the location is not in Singapore. +
+**Alternative 2:** Use some other online maps (e.g. Baidu Map) +
+**Pros:** You are able to find the location in the map even it is not in Singapore. +
+**Cons:** The URL will not be changing during the process, thus it is not easy to achieve the map functions.
+// end::mapmech[]
+
+// tag::birthdaymech[]
+=== Birthday mechanism
+
+The birthday feature allows you to add/update/remove birthday to a selected person. The birthday value is not required when you add a person, since you might not know the birthday of every person. You are not allowed to use `edit` command to update person's birthday.
+
+When you are executing the birthday related commands, only one person is allowed to be selected. The `BIRTHDAY` parameter needs to follow DD/MM/YYYY format. Only the valid date values are allowed to be stored into person's birthday.
+
+The following diagram shows the inheritance diagram for Birthday commands:
+
+image::BirthdayCommandClassDiagram.png[width="800"]
+
+During the implementation, birthday commands parser classes extracts the index number of the person as well as birthday value, and passes them to the corresponding birthday classes. The default birthday value of each person is `01/01/1900`. To add birthday to a person, we actually updated the person's birthday with the new birthday value. To delete a person's birthday, we just update the person's birthday and set it as default value. Updating a person's birthday is similar to adding birthday to the person. The two functions are the same in implementation.
+
+Each time a person is selected from the person list panel, we check the value of the selected person's birthday. If it is default value, it will not be shown in the person details panel.
+
+The adding birthday function is implemented this way:
+[source,java]
+----
+List<ReadOnlyPerson> lastShownList = model.getFilteredPersonList();
+    if (targetIndex.getZeroBased() >= lastShownList.size()) {
+        throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+    }
+
+    ReadOnlyPerson currentPerson = lastShownList.get(targetIndex.getZeroBased());
+    Person personToEdit = (Person) lastShownList.get(targetIndex.getZeroBased());
+    personToEdit.setBirthday(birthdayToAdd);
+
+    try {
+        model.updatePerson(currentPerson, personToEdit);
+    } catch (DuplicatePersonException dpe) {
+        throw new CommandException(MESSAGE_DUPLICATE_PERSON);
+    } catch (PersonNotFoundException pnfe) {
+        throw new AssertionError("The target person cannot be missing");
+    }
+
+    model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+
+    EventsCenter.getInstance().post(new JumpToListRequestEvent(targetIndex));
+
+    return new CommandResult(String.format(MESSAGE_ADD_BIRTHDAY_SUCCESS, personToEdit));
+----
+
+The removing birthday function is implemented this way:
+[source,java]
+----
+List<ReadOnlyPerson> lastShownList = model.getFilteredPersonList();
+    if (targetIndex.getZeroBased() >= lastShownList.size()) {
+        throw new CommandException(Messages.MESSAGE_INVALID_PERSON_DISPLAYED_INDEX);
+    }
+
+    ReadOnlyPerson currentPerson = lastShownList.get(targetIndex.getZeroBased());
+    Person personToEdit = (Person) lastShownList.get(targetIndex.getZeroBased());
+    Birthday birthdayToAdd = new Birthday();
+    personToEdit.setBirthday(birthdayToAdd);
+
+    try {
+        model.updatePerson(currentPerson, personToEdit);
+    } catch (DuplicatePersonException dpe) {
+        throw new CommandException(MESSAGE_DUPLICATE_PERSON);
+    } catch (PersonNotFoundException pnfe) {
+        throw new AssertionError("The target person cannot be missing");
+    }
+
+    model.updateFilteredPersonList(PREDICATE_SHOW_ALL_PERSONS);
+
+    EventsCenter.getInstance().post(new JumpToListRequestEvent(targetIndex));
+
+    return new CommandResult(String.format(MESSAGE_REMOVE_BIRTHDAY_SUCCESS, personToEdit));
+----
+
+The following sequence diagrams show you how the birthday commands work:
+
+image::BirthdayAddCommandSequenceDiagram.png[width="800"]
+
+image::BirthdayRemoveCommandSequenceDiagram.png[width="800"]
+
+[NOTE]
+If no argument is provided after the command word, an invalid format message will be shown.
+
+
+[NOTE]
+If the index number provided is out of the bound of person list, an invalid person index message will be shown.
+
+
+[NOTE]
+If an invalid birthday is provided for birthday-remove command, an invalid input birthday message will be shown.
+
+==== Design Considerations
+
+**Aspect:** Birthday value of a contact +
+**Alternative 1 (current choice):** Every person without specifying a birthday has a default birthday value `01/01/1900` +
+**Pros:** It is easy to create a person object without specifying the birthday value. +
+**Cons:** The birthday will not be shown in the person details panel if the person's birthday is exactly the default birthday. +
+**Alternative 2:** Initialize a person's birthday only when a birthday is added to the person, and set the birthday object as `null` when deleting the birthday +
+**Pros:** There is no default birthday for each person, thus any date can be shown in person details panel. +
+**Cons:** It is not convenient every time we want to create a new person object.
+// end::birthdaymech[]
 
 // tag::undoredo[]
 === Undo/Redo mechanism
@@ -622,28 +857,80 @@ public class TagRemoveCommandParser implements Parser<TagRemoveCommand> {
 **Alternative 2:** Ignore the invalid indices +
 **Pros:** It is efficient for the user +
 **Cons:** Difficult to implement and might be an issue for undo/redo operation.
+// end::tagremove[]
 
+// tag::delete[]
 === Improvements on DeleteCommand
 
 We have improved the delete command to let it be able to delete by multiple indexes or a name with prefix. The reason why we do this is to improve the efficiency to delete the contacts.The prefix for deleting by name is `n/`. The prefix for deleting by indexes is `I/`.
 
-The way we implemented this is to change the DeleteCommandParser and DeleteCommand.
+The following sequence diagram shows how the delete command works:
+
+image::DeleteCommandSequenceDiagram.png[width="800"]
+
+You can see that the way we implemented this is to change the DeleteCommandParser and DeleteCommand.
 
 As for the DeleteCommandParser, we check whether there is the prefix we want in the userInput. Once the prefix is identified, if it is a `n/`, it will directly return back the parameters to DeleteCommand. If it is a `I/`, the parameters will be parsed by ParserUtil and return back the results to DeleteCommand.
 
-As for the DeleteCommand, it can deal with two kinds of parameters: a list of indexes or a name string. If it is a list of indexes, the DeleteCommand will check whether the indexes are within the size of all persons and assert command failure if there is an illegal index. If it is a name string, the DeleteCommand will assert command failure when there is no such person in the list with name given and when there are multiple persons with the same name given.
+For example, the parser for Index is implemented this way:
+[source,java]
+----
+public static ArrayList<Index> parseIndexes(String oneBasedIndexes) throws IllegalValueException {
+        String[] ns = oneBasedIndexes.trim().split(" ");
+        ArrayList<Index> numbers = new ArrayList<>();
+        boolean allvalid = true;
+        for (String a : ns) {
+            String s = a.trim();
+            if (StringUtil.isNonZeroUnsignedInteger(s)) {
+                numbers.add(Index.fromOneBased(Integer.parseInt(s)));
+            } else {
+                allvalid = false;
+
+            }
+        }
+        if (!allvalid) {
+            throw new IllegalValueException(MESSAGE_INVALID_INDEX);
+        }
+        return numbers;
+
+    }
+----
+
+As for the DeleteCommand, you can use it to deal with two kinds of parameters: a list of indexes or a name string. If it is a list of indexes, the DeleteCommand will check whether the indexes are within the size of all persons and assert command failure if there is an illegal index. If it is a name string, the DeleteCommand will assert command failure when there is no such person in the list with name given and when there are multiple persons with the same name given.
+
+For example, the command delete people by index is implemented this way:
+[source,java]
+----
+ List<ReadOnlyPerson> lastShownList =  model.getFilteredPersonList();
+ ArrayList<ReadOnlyPerson> personstodelete =  new ArrayList<ReadOnlyPerson>();
+ //...delete name logic
+ for (Index s: targetIndexs) {
+     if (s.getZeroBased() >= lastShownList.size()) {
+          allvalid = false;
+         } else {
+          personstodelete.add(lastShownList.get(s.getZeroBased()));
+          exist = true;
+         }
+ }
+ //...dealing duplicate logic...
+ if (allvalid && exist) {
+    try {
+        model.deletePerson(personstodelete);
+    }
+    //...catch exception logic...
+ }
+----
+[NOTE]
+If your input doesn't start with correct prefix, then the command can't identify what kind of input it deals with, and a `ParseException` will be thrown when parsing.
 
 [NOTE]
-If the parameter doesn't start with correct prefix, then the command can't identify what kind of input it deals with, and a `ParseException` will be thrown when parsing.
+If your input contains illegal values or nothing after the prefix, the the command can't identify the target person, and a `ParseException` will be thrown when parsing.
 
 [NOTE]
-If the parameter contains illegal values or nothing after the prefix, the the command can't identify the target person, and a `ParseException` will be thrown when parsing.
+If your input is index and it is out of bound of person list, then the command can't find the person to delete, and a `CommandException` will be thrown when processsing.
 
 [NOTE]
-If the parameter is index and it is out of bound of person list, then the command can't find the person to delete, and a `CommandException` will be thrown when processsing.
-
-[NOTE]
-If the parameter is name and there is no person with such name in the list, then the command can't find the person to delete, and a `CommandException` will be thrown when processsing.
+If your input is a name and there is no person with such name in the list, then the command can't find the person to delete, and a `CommandException` will be thrown when processsing.
 
 Moreover, if there is more than one person in the list with the name give, then the command don't know which one ot delete. It will show all the person with same name in GUI and remind the user to choose one to delete.
 
@@ -667,7 +954,59 @@ Moreover, if there is more than one person in the list with the name give, then 
 **Alternative 2:** Delete the first person with the name in the list and show it to user. +
 **Pros:**  It cost users less time to delete a person if they know the sequence of the persons with the same name. +
 **Cons:** It is hard to guarantee the right person is deleted. The user may need to redo to fix it.
-// tag::tagremove[]
+// end::delete[]
+
+// tag::help[]
+===Improvement on HelpCommand
+
+We make the help command to be able to alert the usage of a speified command.
+
+The way we do it is to make the help command paser to identify the command word after 'help' and show the command usage of that command.
+
+For example, you can see the implementation of the help command parser as follow:
+[source,java]
+----
+public HelpCommand parse(String args) throws ParseException {
+    String input = args.toLowerCase().trim();
+
+    if (input.equals(AddCommand.COMMAND_WORD) || input.equals(AddCommand.COMMAND_WORD_2)
+        || input.equals(AddCommand.COMMAND_WORD_3)) {
+        return new HelpCommand("add");
+    }//... other command logic...
+}
+----
+[NOTE]
+If the input command word after 'help' can not be identified, then you will see the whole UserGuide.
+// end::help[]
+
+// tag::bin[]
+===RecycleBin Mechanism
+
+We design a recycle bin in the iConnect to store the person removed from address book. In this way, users can restore the people they wrongly deleted. You may think that it can be done by udno/redo command. Actually, if users want to restore a person they deleted long time ago, then the undo/redo command would not hlep.
+
+The users can interact with bin using four commands:'bin-list', 'bin-delete', 'bin-clear', 'bin-restore';
+
+The way we deal with recycle bin storage is the same as we deal with addressbook storage. We store the recycle bin as a xml file and read and save it in the same way as address book storage. Then we put the addressbook and recycleibn into model.
+
+*Bin commands*
+
+* `bin-list` : List all the people in the recycle bin in list.
+* `bin-delete` : Delete the people in the recycle bin by index as shown in the list.
+* `bin-clear` : Delete all the peopel in the recycle bin.
+* `bin-restore` : Restore the people in the recycle bin to address book by index.
+
+[NOTE]
+If we find duplicate people when moving a person to recyclebin or moving a person to addressbook, then this person will be omitted and directly remove.
+// end::bin[]
+
+// tag::export[]
+===Exporting
+
+We are using 'java.io.File' and 'java.io.FileWriter' to export address book data.
+
+* The filepath should be a complete path to a specific location of a empty txt file in your computer.
+* The order of the output information is 'person', 'tag', 'event';
+// end::export[]
 
 === Logging
 

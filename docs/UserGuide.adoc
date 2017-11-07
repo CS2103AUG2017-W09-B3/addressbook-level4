@@ -60,11 +60,14 @@ e.g. typing *`help`* and pressing kbd:[Enter] will open the help window.
 [NOTE]
 iConnect will be referred to as *address book* in the following documentation.
 
+// tag::help[]
 === Viewing help : `help` _[Since v1.3]_
+
+If you don't know how to use some commands, don't worry, help command can guide you.
 
 _Alias:_ `h`
 
-Shows the usage of the given command word.
+You can look up the usage of the given command word using help command.
 
 Format: `help COMMAND`
 
@@ -74,6 +77,7 @@ Examples:
 Shows the usage of command `list`
 * `help add` +
 Shows the usage of command `add`
+// end::help[]
 
 === Adding a person: `add` _[Since v1.1]_
 
@@ -128,11 +132,12 @@ Edits the phone number and email address of the 1st person to be `91234567` and 
 * `modify 1 p/91234567 e/johndoe@example.com` +
 Edits the phone number and email address of the 1st person to be `91234567` and `johndoe@example.com` respectively
 
+// tag::find[]
 === Locating persons by different attributes: `find` _[Since v1.2]_
 
 _Alias:_ `search` `get`
 
-Searches for persons whose specified attribute contains any of the given keywords.
+Sometimes you might not remember the full name of a person. Perhaps you only know the phone number or home address of the person. But don't worry! By using this command, you are able to search for your contacts by some other informations such as phone number, email and home address. Even if you cannot remember the full name of your friend, you can still easily find him by his partial name!
 
 Format: `find [n/NAME] [p/PHONE] [e/EMAIL] [a/ADDRESS]`
 
@@ -156,6 +161,7 @@ Returns the person having phone number `98765432`
 Returns the person having email `johndoe@gmail.com`
 * `find n/Betsy Tim John a/clementi street` +
 Returns any person having names `Betsy`, `Tim`, `John` or living at `Clementi Street`
+// end::find[]
 
 === Sorting list of persons: `sort` _[Since v1.2]_
 
@@ -185,11 +191,13 @@ Returns list of persons sorted by phone in ascending order
 * `sort t/DSC` +
 Returns list of persons sorted by time added in descending order
 
+// tag::delete[]
 === Deleting a person : `delete` _[Since v1.2]_
+If you want to keep your person list clean, just using delete command to remove some people to bin.
 
 _Alias:_ `remove` `-`
 
-Deletes a group of people from the address book.
+You can delete a group of people from the address book.
 
 Format:`delete I/INDEX INDEX ...` (or) `delete n/Name`
 
@@ -215,6 +223,7 @@ Deletes the 2nd and 3rd person in the address book
 * `find Betsy` +
 `delete 1` +
 Deletes the 1st person in the results of the `find` command
+// end::delete[]
 
 // tag::tadd[]
 === Adding a tag to a person(s) : `t-add` _[Since v1.1]_
@@ -325,9 +334,15 @@ This command lists all the people with tag `friend`
 This command could also list all the people with tag `friend` if any
 // end::tfind[]
 
+Examples:
+
+* `t-find friend classmate`
+Shows all the people with tag `friend` or tag `classmate`
+
+// tag::map[]
 === Find the location of a person using Google Map: `m-show` _[Since v1.3]_
 
-Finds the location of a person as specified in the contact address in Google Map.
+You might find it not very convenient to only show the contact's location as text. Therefore, iConnect allows you to see the location! By using this command, without typing in the person's address, you can easily find the location of your friend in Google Map, which will show in the centre browser.
 
 Format: `m-show INDEX`
 
@@ -345,7 +360,7 @@ Shows the address of person with index 1 on the google map
 
 === Find the route from user's current location to the person seleted: `m-route` _[Since v1.3]_
 
-Gets the shortest path from the location provided to the address of the selected person in Google map.
+Not only can iConnect show the location, it can also show you how to go there! Simply by adding your current location, it will show you the shortest path from your current address to your friend's home in the Google map.
 
 Format: `m-route INDEX a/ADDRESS`
 
@@ -363,6 +378,7 @@ Examples:
 Shows the route from `Clementi Street` to the address of person with index number `1`
 * `m-route 7 a/John street, block 123, #01-01` +
 Shows the route from `John street, block 123, #01-01` to the address of person with index number `7`
+// end::map[]
 
 === Schedule an Event: s-add _[Since v1.4]_
 
@@ -409,17 +425,19 @@ Examples:
 Removes a single event with the index 1.
 * `s-remove 1 2 3` +
 Removes 3 events with the index 1, 2 and 3.
-
+// tag::export[]
 === Making a backup address book: `export` _[Coming in v1.4]_
 
-Backup your contact details to the given path.
+If you want to keep your address book clean and worry about how to get the contacts back, just export the information.
+
+You can keep a backup of your contact details to the given path.
 
 Format: `export PATH`
 
 ****
 * Export all the information of contacts to the given local address.
 ****
-
+// end::export[]
 === Selecting a person : `select` _[Since v1.1]_
 
 _Alias:_ `choose`
@@ -507,16 +525,20 @@ The `redo` command fails as there are no `undo` commands executed previously
 `redo` (reapplies the `delete 1` command) +
 `redo` (reapplies the `clear` command) +
 // end::undoredo[]
+// tag::bin[]
+=== Listing all persons removed: `bin-list` _[Since v1.5]_
 
-=== Listing all persons removed: `bin-list` _[Coming in v2.0]_
+If you are worrying about deleting people wrongly, it would be a good way to see if they are in recycle bin.
 
-Shows a list of persons removed from the address book.
+You can see a list of persons removed from the address book.
 
 Format: `bin-list`
 
-=== Restoring person(s) : `bin-restore` _[Coming in v2.0]_
+=== Restoring person(s) : `bin-restore` _[Since v1.5]_
 
-Restores person(s) from bin.
+You find that people you wrongly deleted from address book in recycle bin, you can restore them back now.
+
+You can restore person(s) from bin to address book.
 
 Format: `bin-restore INDEX INDEX ...`
 
@@ -533,11 +555,107 @@ Examples:
 `bin-restore 1 2` +
 Restores the 1st and 2nd person in the bin-list
 
-=== Clearing all contacts from bin : `bin-clear` _[Coming in v2.0]_
+=== Restoring person(s) : `bin-delete` _[Since v1.5]_
+
+If you want to keep your recycle bin clean, you can delete some of them from recycle bin. But you can't get them back.
+
+You can delete person(s) from bin.
+
+Format: `bin-delete INDEX INDEX ...`
+
+****
+* Recovers the people at these given specified `INDEX`.
+* The index refers to the index number shown in the most recent bin-list.
+* The index *must be a positive integer* 1, 2, 3, ...
+* The index must not be greater than the most recent bin size.
+****
+
+Examples:
+
+* `bin-list` +
+`bin-delete 1 2` +
+Delete the 1st and 2nd person in the bin-list
+
+=== Clearing all contacts from bin : `bin-clear` _[Since v1.5]_
 
 Clears all entries in the bin.
 
 Format: `clear-bin`
+// end::bin[]
+
+// tag::birthday[]
+=== Adding the birthday to a person : `b-add` _[Since v1.4]_
+
+Would it be nice if you can store the birthday of your contact so that you won't forget to send him a gift? Of course! By using this command, you are allowed to add birthday to a person. You can easily check it out using the calendar in the app. If you accidentally typed a wrong birthday, you can use this command again and enter the correct one.
+
+Format: `b-add INDEX BIRTHDAY`
+
+****
+* Adds birthday to the person at the specified `INDEX`.
+* The index refers to the index number shown in the most recent listing, only one index is allowed.
+* The index *must be a positive integer* 1, 2, 3, ...
+* The `BIRTHDAY` must follow the format DD/MM/YYYY, and it must be a valid date.
+* To update the birthday of a specified person, use `b-add` command and enter the new `BIRTHDAY` value.
+****
+
+Examples:
+
+* `find n/john` +
+`b-add 1 18/10/1993` +
+Adds the birthday 18/10/1993 to the first person named john in the address book
+
+=== Removing the birthday from a person : `b-remove` _[Since v1.5]_
+
+If you add the birthday to a wrong person, you can always enter this command to remove the birthday from the person.
+
+Format: `b-remove INDEX`
+
+****
+* Removes the birthday value from the person at the specified `INDEX`.
+* The index refers to the index number shown in the most recent listing, only one index is allowed.
+* The index *must be a positive integer* 1, 2, 3, ...
+* The `BIRTHDAY` removed just now can be restored by using the `undo` command.
+****
+
+Examples:
+
+* `find n/john` +
+`b-remove 1` +
+Removes the birthday from the first person named john in the address book
+* `b-remove 6` +
+Removes the birthday from the 6th person in the most recent listing, and shows an error if there are less than 6 persons in the list
+// end::birthday[]
+
+// tag::link[]
+=== Adding a social media URL to a person: `l-add` _[Coming in v2.0]_
+
+You will find it very convenient to add some social media URLs to your friends so that you are able to see their posts and recent activities simply by clicking those social media icons in the centre person details panel. In this way, you do not need to open each social media app and search for the person before you can see their posts.
+
+Format: `l-add INDEX [tt/TWITTER] / [fb/FACEBOOK] / [nm/NUSMODS] / [ig/INSTAGRAM] / [gh/GITHUB]`
+
+****
+* Adds the social media link to the person at the specified `INDEX`.
+* The index refers to the index number shown in the most recent listing, only one index is allowed.
+* The index *must be a positive integer* 1, 2, 3, ...
+* A prefix is required before entering the corresponding URL. Only one prefix and one URL is allowed for each command.
+* This command will also update the existing value to the input value.
+****
+
+Examples:
+
+* `l-add 1 fb/https://www.facebook.com/dale.sun.507` +
+Adds the Facebook URL to the 1st person in the contact list
+* `l-add 3 gh/https://github.com/dalessr` +
+Adds the GitHub URL to the 3rd person in the contact list
+// end::link[]
+
+// tag::shell[]
+=== Launching shell version : `shell` _[Coming in v2.0]_
+
+By using this command, you can open the shell version of the app. In this way, you are able to use the app without the clutter. You can still achieve most of the operations by only using the shell, except for some features related to the browser (e.g. the Map feature).
+
+Format: `shell`
+// end::shell[]
 
 === Clearing all entries : `clear`
 
@@ -595,6 +713,14 @@ e.g. `s-add m/1 2 3 n/iConnect Conference t/2017-12-04 08:45 d/120`
 e.g. `s-remove e/1 2 3`
 * *Export* : `export PATH` +
 e.g. `export /desktop/new_folder`
+* *Bindelete* : `bin-delete INDEX INDEX...` +
+e.g. `bin-delete 1 2 3`
+* *Binlist* : `bin-list` +
+e.g. `bin-list`
+* *Binrestore* : `bin-restore INDEX INDEX...` +
+e.g. `bin-restore 1 2 3`
+* *Binclear* : `bin-clear` +
+e.g. `bin-clear`
 * *Select* : `select INDEX` +
 e.g.`select 2`
 * *History* : `history`
@@ -604,5 +730,12 @@ e.g.`select 2`
 * *BinRestore* : `bin-restore INDEX INDEX...` +
 e.g. `bin-restore 1 2`
 * *BinClear* : `bin-clear`
+* *BirthdayAdd* : `b-add INDEX BIRTHDAY` +
+e.g. `b-add 1 18/10/1993`
+* *BirthdayRemove* : `b-remove INDEX` +
+e.g. `b-remove 1`
+* *LinkAdd* : `l-add INDEX [tt/TWITTER] / [fb/FACEBOOK] / [nm/NUSMODS] / [ig/INSTAGRAM] / [gh/GITHUB]` +
+e.g. `l-add 1 gh/https://github.com/dalessr`
+* *Shell* : `shell`
 * *Clear* : `clear`
 * *Exit* : `exit`
